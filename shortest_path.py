@@ -1,4 +1,4 @@
-class MH():  #min heap
+class MH(object):  #min heap
 
 	def __init__(self, f = (lambda x: x) ):  #default comparison function is id
 		self.list = []
@@ -61,7 +61,7 @@ class MH():  #min heap
 			return y
 			
 			
-class SP(): #shortest path
+class SP(object): #shortest path
 
 	def __init__(self, n):
 		self.size = n #number of vertices
@@ -82,10 +82,17 @@ class SP(): #shortest path
 	def relax(self,a):
 		for (b,w) in self.edges[a]:
 			if self.marked[b] == False:
-				if self.dist[a] + w < self.dist[b]:
+				if self.dist[b] == float('inf'):  #first time b enters the heap
 					self.dist[b] = self.dist[a] + w
 					self.edgeto[b] = (a,b)
-					self.PQ.insert((b,self.dist[b]))  #we're lazy
+					self.PQ.insert((b,self.dist[b]))
+				elif self.dist[a] + w < self.dist[b]: #b already on heap, but found better path
+					c = self.dist[b]
+					self.dist[b] = self.dist[a] + w
+					self.edgeto[b] = (a,b)
+					a = self.PQ.list.index((b,c)) #the index of the old pair
+					self.PQ.list[a] = (b,self.dist[b]) #replace with new distance
+					self.PQ.swim(a) #distance decreased, so can only swim up
 					
 	def SPS(self):
 		self.PQ.insert((0,0))
